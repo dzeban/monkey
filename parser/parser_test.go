@@ -80,3 +80,33 @@ func checkParserErrors(t *testing.T, p *Parser) {
 
 	t.FailNow()
 }
+
+func TestReturnStatements(t *testing.T) {
+	input := `
+return 5;
+return 10;
+return 16378263789;
+`
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements must containt 3 statements, got %d", len(program.Statements))
+	}
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt is not *ast.ReturnStatement, it's %T", stmt)
+			continue
+		}
+
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral is not 'return', it's %s", returnStmt.TokenLiteral())
+		}
+	}
+}
