@@ -1,56 +1,18 @@
 package ast
 
-import (
-	"github.com/dzeban/monkey/token"
-)
-
+// Node is a genenric AST node, that can print it's token literal
 type Node interface {
 	TokenLiteral() string
 }
 
+// Statement is a type for the language statements
 type Statement interface {
 	Node
 	statementNode()
 }
 
+// Expression holds an expression of the language
 type Expression interface {
 	Node
 	expressionNode()
 }
-
-type Program struct {
-	Statements []Statement
-}
-
-func (p *Program) TokenLiteral() string {
-	if len(p.Statements) > 0 {
-		return p.Statements[0].TokenLiteral()
-	} else {
-		return ""
-	}
-}
-
-type LetStatement struct {
-	Token token.Token
-	Ident *Identifier
-	Expr  Expression
-}
-
-func (ls *LetStatement) statementNode()       {}
-func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
-
-type ReturnStatement struct {
-	Token token.Token
-	Expr  Expression
-}
-
-func (rs *ReturnStatement) statementNode()       {}
-func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
-
-type Identifier struct {
-	Token token.Token
-	Value string
-}
-
-func (i *Identifier) expressionNode()      {}
-func (i *Identifier) TokenLiteral() string { return i.Token.Literal }

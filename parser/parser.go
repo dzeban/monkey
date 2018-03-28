@@ -8,6 +8,7 @@ import (
 	"github.com/dzeban/monkey/token"
 )
 
+// Parser parses the program by building AST
 type Parser struct {
 	l *lexer.Lexer
 
@@ -17,6 +18,7 @@ type Parser struct {
 	errors []string
 }
 
+// New creates new parser with a given Lexer
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
 		l:      l,
@@ -30,6 +32,7 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
+// Errors returns the list of parsing errors
 func (p *Parser) Errors() []string {
 	return p.errors
 }
@@ -44,6 +47,7 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.l.NextToken()
 }
 
+// ParseProgram builds AST
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{
 		Statements: []ast.Statement{},
@@ -116,8 +120,8 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
 		return true
-	} else {
-		p.peekError(t)
-		return false
 	}
+
+	p.peekError(t)
+	return false
 }

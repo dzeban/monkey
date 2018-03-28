@@ -1,16 +1,18 @@
 package repl
 
 import (
-	"github.com/dzeban/monkey/lexer"
-	"github.com/dzeban/monkey/token"
-
 	"bufio"
 	"fmt"
 	"io"
+
+	"github.com/dzeban/monkey/lexer"
+	"github.com/dzeban/monkey/token"
 )
 
+// PROMPT is a REPL prompt
 const PROMPT = ">> "
 
+// Start creates new REPL
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 

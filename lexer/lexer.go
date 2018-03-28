@@ -1,9 +1,8 @@
 package lexer
 
-import (
-	"github.com/dzeban/monkey/token"
-)
+import "github.com/dzeban/monkey/token"
 
+// Lexer parses input stream and produces tokens
 type Lexer struct {
 	input string
 	cur   int
@@ -11,12 +10,14 @@ type Lexer struct {
 	ch    byte
 }
 
+// New returns new Lexer
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
 	l.readChar() // initializes lexer
 	return l
 }
 
+// NextToken returns next token by advancing input stream
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
@@ -95,15 +96,15 @@ func (l *Lexer) readChar() {
 		l.ch = l.input[l.next]
 	}
 	l.cur = l.next
-	l.next += 1
+	l.next++
 }
 
 func (l *Lexer) peekChar() byte {
 	if l.next >= len(l.input) {
 		return 0
-	} else {
-		return l.input[l.next]
 	}
+
+	return l.input[l.next]
 }
 
 func (l *Lexer) skipWhitespace() {

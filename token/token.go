@@ -55,6 +55,7 @@ var keywords = map[string]TokenType{
 	"return": RETURN,
 }
 
+// LookupType returns the type of the given token hold in string
 func LookupType(s string) TokenType {
 	if tokType, ok := keywords[s]; ok {
 		return tokType
