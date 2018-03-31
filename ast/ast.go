@@ -3,6 +3,7 @@ package ast
 // Node is a genenric AST node, that can print it's token literal
 type Node interface {
 	TokenLiteral() string
+	String() string
 }
 
 // Statement is a type for the language statements
