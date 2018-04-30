@@ -37,7 +37,7 @@ const (
 	GT = ">"
 
 	COMMA     = ","
-	SEMICOLON = "+"
+	SEMICOLON = ";"
 
 	LPAREN = "("
 	RPAREN = ")"
