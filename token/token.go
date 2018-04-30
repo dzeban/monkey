@@ -1,12 +1,15 @@
 package token
 
+// TokenType is a custom type for token
 type TokenType string
 
+// Token struct describes a token with a given Type and holds its literal
 type Token struct {
 	Type    TokenType
 	Literal string
 }
 
+// Tokens of the monkey language
 const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
