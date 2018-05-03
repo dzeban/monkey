@@ -86,6 +86,8 @@ func (p *Parser) setupParseFns() {
 		token.INT:   p.parseIntegerLiteral,
 		token.BANG:  p.parsePrefixExpression,
 		token.MINUS: p.parsePrefixExpression,
+		token.TRUE:  p.parseBoolean,
+		token.FALSE: p.parseBoolean,
 	}
 
 	p.infixParseFns = map[token.TokenType]infixParseFn{
@@ -270,4 +272,11 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	p.nextToken()
 	expr.Right = p.parseExpression(precedence)
 	return expr
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+	return &ast.Boolean{
+		Token: p.curToken,
+		Value: p.curTokenIs(token.TRUE),
+	}
 }
