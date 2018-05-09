@@ -82,12 +82,14 @@ func New(l *lexer.Lexer) *Parser {
 
 func (p *Parser) setupParseFns() {
 	p.prefixParseFns = map[token.TokenType]prefixParseFn{
-		token.IDENT: p.parseIdentifier,
-		token.INT:   p.parseIntegerLiteral,
-		token.BANG:  p.parsePrefixExpression,
-		token.MINUS: p.parsePrefixExpression,
-		token.TRUE:  p.parseBoolean,
-		token.FALSE: p.parseBoolean,
+		token.IDENT:  p.parseIdentifier,
+		token.INT:    p.parseIntegerLiteral,
+		token.BANG:   p.parsePrefixExpression,
+		token.MINUS:  p.parsePrefixExpression,
+		token.TRUE:   p.parseBoolean,
+		token.FALSE:  p.parseBoolean,
+		token.LPAREN: p.parseGroupExpression,
+		token.IF:     p.parseIfExpression,
 	}
 
 	p.infixParseFns = map[token.TokenType]infixParseFn{
@@ -279,4 +281,68 @@ func (p *Parser) parseBoolean() ast.Expression {
 		Token: p.curToken,
 		Value: p.curTokenIs(token.TRUE),
 	}
+}
+
+func (p *Parser) parseGroupExpression() ast.Expression {
+	// Skip LPAREN token
+	p.nextToken()
+
+	exp := p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return exp
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	expr := &ast.IfExpression{Token: p.curToken}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	p.nextToken()
+
+	expr.Condition = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	expr.Consequence = p.parseBlockStatement()
+
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken()
+
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+
+		expr.Alternative = p.parseBlockStatement()
+	}
+
+	return expr
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	bs := &ast.BlockStatement{
+		Token:      p.curToken, // token.LBRACE
+		Statements: []ast.Statement{},
+	}
+	p.nextToken() // skip LBRACE
+
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			bs.Statements = append(bs.Statements, stmt)
+		}
+		p.nextToken() // why?
+	}
+
+	return bs
 }
