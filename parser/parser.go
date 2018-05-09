@@ -82,14 +82,15 @@ func New(l *lexer.Lexer) *Parser {
 
 func (p *Parser) setupParseFns() {
 	p.prefixParseFns = map[token.TokenType]prefixParseFn{
-		token.IDENT:  p.parseIdentifier,
-		token.INT:    p.parseIntegerLiteral,
-		token.BANG:   p.parsePrefixExpression,
-		token.MINUS:  p.parsePrefixExpression,
-		token.TRUE:   p.parseBoolean,
-		token.FALSE:  p.parseBoolean,
-		token.LPAREN: p.parseGroupExpression,
-		token.IF:     p.parseIfExpression,
+		token.IDENT:    p.parseIdentifier,
+		token.INT:      p.parseIntegerLiteral,
+		token.BANG:     p.parsePrefixExpression,
+		token.MINUS:    p.parsePrefixExpression,
+		token.TRUE:     p.parseBoolean,
+		token.FALSE:    p.parseBoolean,
+		token.LPAREN:   p.parseGroupExpression,
+		token.IF:       p.parseIfExpression,
+		token.FUNCTION: p.parseFunctionExpression,
 	}
 
 	p.infixParseFns = map[token.TokenType]infixParseFn{
@@ -345,4 +346,50 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	}
 
 	return bs
+}
+
+func (p *Parser) parseFunctionExpression() ast.Expression {
+	fn := &ast.FunctionExpression{Token: p.curToken}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	fn.Params = p.parseFunctionParams()
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	fn.Body = p.parseBlockStatement()
+
+	return fn
+}
+
+func (p *Parser) parseFunctionParams() []*ast.Identifier {
+	var params []*ast.Identifier
+
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return params
+	}
+
+	p.nextToken()
+
+	param := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	params = append(params, param)
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken() // skip comma
+		p.nextToken() // advance to the next param
+
+		param := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+		params = append(params, param)
+	}
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return params
 }
