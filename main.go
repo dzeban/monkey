@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/dzeban/monkey/repl"
-
 	"os"
+
+	"github.com/dzeban/monkey/repl"
 )
 
 func main() {
