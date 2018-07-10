@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dzeban/monkey/eval"
 	"github.com/dzeban/monkey/lexer"
 	"github.com/dzeban/monkey/parser"
 )
@@ -35,8 +36,14 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		e := eval.Eval(program)
+		if e != nil {
+			io.WriteString(out, e.Inspect())
+			io.WriteString(out, "\n")
+		} else {
+			io.WriteString(out, "failed to eval program")
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
