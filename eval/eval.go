@@ -5,6 +5,14 @@ import (
 	"github.com/dzeban/monkey/object"
 )
 
+// Single instances for trivial eval values
+var (
+	NULL  = &object.Null{}
+	TRUE  = &object.Boolean{Value: true}
+	FALSE = &object.Boolean{Value: false}
+)
+
+// Eval evaluates parsed AST
 func Eval(node ast.Node) object.Object {
 	switch node.(type) {
 	case *ast.Program:
@@ -18,6 +26,13 @@ func Eval(node ast.Node) object.Object {
 	case *ast.IntegerLiteral:
 		il := node.(*ast.IntegerLiteral)
 		return &object.Integer{Value: il.Value}
+
+	case *ast.Boolean:
+		b := node.(*ast.Boolean)
+		if b.Value {
+			return TRUE
+		}
+		return FALSE
 	}
 
 	return nil
