@@ -29,15 +29,18 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.Boolean:
 		b := node.(*ast.Boolean)
-		if b.Value {
-			return TRUE
-		}
-		return FALSE
+		return boolToBoolean(b.Value)
 
 	case *ast.PrefixExpression:
 		e := node.(*ast.PrefixExpression)
 		right := Eval(e.Right)
 		return evalPrefixExpression(e.Operator, right)
+
+	case *ast.InfixExpression:
+		e := node.(*ast.InfixExpression)
+		left := Eval(e.Left)
+		right := Eval(e.Right)
+		return evalInfixExpression(e.Operator, left, right)
 
 	}
 
@@ -85,4 +88,57 @@ func evalMinuxPrefixOperator(right object.Object) object.Object {
 
 	value := right.(*object.Integer).Value
 	return &object.Integer{Value: -value}
+}
+
+func evalInfixExpression(op string, left, right object.Object) object.Object {
+	if left.Type() == object.TypeInteger && right.Type() == object.TypeInteger {
+		return evalIntegerInfixExpression(op, left, right)
+	}
+
+	if op == "==" {
+		// This is a pointers comparison because booleans are single
+		// instance values declared as package vars TRUE and FALSE.
+		return boolToBoolean(left == right)
+	}
+
+	if op == "!=" {
+		// This is a pointers comparison because booleans are single
+		// instance values declared as package vars TRUE and FALSE.
+		return boolToBoolean(left != right)
+	}
+
+	return NULL
+}
+
+func evalIntegerInfixExpression(op string, left, right object.Object) object.Object {
+	leftVal := left.(*object.Integer).Value
+	rightVal := right.(*object.Integer).Value
+
+	switch op {
+	case "+":
+		return &object.Integer{Value: leftVal + rightVal}
+	case "-":
+		return &object.Integer{Value: leftVal - rightVal}
+	case "*":
+		return &object.Integer{Value: leftVal * rightVal}
+	case "/":
+		return &object.Integer{Value: leftVal / rightVal}
+	case "<":
+		return boolToBoolean(leftVal < rightVal)
+	case ">":
+		return boolToBoolean(leftVal > rightVal)
+	case "==":
+		return boolToBoolean(leftVal == rightVal)
+	case "!=":
+		return boolToBoolean(leftVal != rightVal)
+	default:
+		return NULL
+	}
+}
+
+func boolToBoolean(b bool) *object.Boolean {
+	if b {
+		return TRUE
+	}
+	return FALSE
 }
