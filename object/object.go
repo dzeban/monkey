@@ -10,6 +10,7 @@ const (
 	TypeNull        = "NULL"
 	TypeReturnValue = "RETURN_VALUE"
 	TypeError       = "ERROR"
+	TypeFunction    = "FUNCTION"
 )
 
 // Object defines contract that should be implemented by all objects like integers
