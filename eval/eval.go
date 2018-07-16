@@ -17,11 +17,24 @@ func Eval(node ast.Node) object.Object {
 	switch node.(type) {
 	case *ast.Program:
 		p := node.(*ast.Program)
-		return evalStatements(p.Statements)
+		return evalProgram(p)
 
 	case *ast.ExpressionStatement:
 		s := node.(*ast.ExpressionStatement)
 		return Eval(s.Expression)
+
+	case *ast.BlockStatement:
+		bs := node.(*ast.BlockStatement)
+		return evalBlockStatement(bs)
+
+	case *ast.IfExpression:
+		ie := node.(*ast.IfExpression)
+		return evalIfExpression(ie)
+
+	case *ast.ReturnStatement:
+		rs := node.(*ast.ReturnStatement)
+		val := Eval(rs.Expr)
+		return &object.ReturnValue{Value: val}
 
 	case *ast.IntegerLiteral:
 		il := node.(*ast.IntegerLiteral)
@@ -47,11 +60,29 @@ func Eval(node ast.Node) object.Object {
 	return nil
 }
 
-func evalStatements(stmts []ast.Statement) object.Object {
+func evalProgram(p *ast.Program) object.Object {
 	var result object.Object
 
-	for _, stmt := range stmts {
+	for _, stmt := range p.Statements {
 		result = Eval(stmt)
+
+		if returnValue, ok := result.(*object.ReturnValue); ok {
+			return returnValue.Value
+		}
+	}
+
+	return result
+}
+
+func evalBlockStatement(bs *ast.BlockStatement) object.Object {
+	var result object.Object
+
+	for _, statement := range bs.Statements {
+		result = Eval(statement)
+
+		if result != nil && result.Type() == object.TypeReturnValue {
+			return result
+		}
 	}
 
 	return result
@@ -141,4 +172,29 @@ func boolToBoolean(b bool) *object.Boolean {
 		return TRUE
 	}
 	return FALSE
+}
+
+func evalIfExpression(ie *ast.IfExpression) object.Object {
+	condition := Eval(ie.Condition)
+
+	if isTruthy(condition) {
+		return Eval(ie.Consequence)
+	} else if ie.Alternative != nil {
+		return Eval(ie.Alternative)
+	} else {
+		return NULL
+	}
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj {
+	case NULL:
+		return false
+	case FALSE:
+		return false
+	case TRUE:
+		return true
+	default:
+		return true
+	}
 }

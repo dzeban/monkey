@@ -5,9 +5,10 @@ type Type string
 
 // Object types
 const (
-	TypeInteger = "INTEGER"
-	TypeBoolean = "BOOLEAN"
-	TypeNull    = "NULL"
+	TypeInteger     = "INTEGER"
+	TypeBoolean     = "BOOLEAN"
+	TypeNull        = "NULL"
+	TypeReturnValue = "RETURN_VALUE"
 )
 
 // Object defines contract that should be implemented by all objects like integers
