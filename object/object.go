@@ -9,6 +9,7 @@ const (
 	TypeBoolean     = "BOOLEAN"
 	TypeNull        = "NULL"
 	TypeReturnValue = "RETURN_VALUE"
+	TypeError       = "ERROR"
 )
 
 // Object defines contract that should be implemented by all objects like integers
